@@ -6,7 +6,7 @@ use Modern::Perl 2018;
 use Export::Attrs;
 
 use CInet::Base;
-use Array::Set qw(set_diff)
+use Array::Set qw(set_diff);
 use List::Util qw(all);
 use Algorithm::Combinatorics qw(subsets);
 
@@ -33,7 +33,7 @@ sub is_selfadhesive_at {
     # 2. $S restricted to $M must be $x.
     for my $ijK ($Ncube->squares) {
         # Translate N-symbol to M-symbol
-        my $MijK = [ map { [ map $NtoM{$_}, @$_ ] } @ijK ];
+        my $MijK = [ map { [ map $NtoM{$_}, @$_ ] } @$ijK ];
         $S->[$NMcube->pack($ijK)] = $S->[$NMcube->pack($MijK)] =
             $x->[$Ncube->pack($ijK)];
     }
