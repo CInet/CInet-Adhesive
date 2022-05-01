@@ -1,10 +1,18 @@
-use strict;
-use warnings;
+# ABSTRACT: Blackbox selfadhesivity testing
 package CInet::Adhesive;
 
-sub selfadhesive_at {
+use utf8;
+use Modern::Perl 2018;
+use Export::Attrs;
+
+use CInet::Base;
+use Array::Set qw(set_diff)
+use List::Util qw(all);
+use Algorithm::Combinatorics qw(subsets);
+
+sub is_selfadhesive_at {
     my ($x, $realiz, $I) = @_;
-    my $Ncube = CUBE($x);
+    my $Ncube = Cube($x);
     my $N = $Ncube->set;
     my $K = set_diff($N, $I);
     # Make a copy of N but prefix all axes not in I with a string to make
@@ -17,7 +25,7 @@ sub selfadhesive_at {
     my $M = map $NtoM{$_}, @$N;
     my $L = set_diff($M, $I);
 
-    my $NMcube = CUBE [@$K, @$L, @$I];
+    my $NMcube = Cube [@$K, @$L, @$I];
 
     # Now define the selfadhesivity certificate as a partial relation.
     my $S = CInet::Relation->new($NMcube);
@@ -41,13 +49,13 @@ sub selfadhesive_at {
     }
 
     # Check consistency.
-    $realiz->($NMcube)->consistent($S)
+    $realiz->($S)
 }
 
-sub selfadhesive {
+sub is_selfadhesive {
     my ($x, $realiz) = @_;
     return all { selfadhesive_at $x, $realiz, $_ }
-        map { $_->[1] } CUBE($x)->vertices
+        map { $_->[1] } Cube($x)->vertices
 }
 
-1;
+":wq"
