@@ -59,7 +59,7 @@ sub is_selfadhesive_at :Export(:DEFAULT) {
     for my $k (@$K) {
         for my $l (@$L) {
             for my $P (subsets(set_diff($NMcube->set, [$k, $l, @$I]))) {
-                $S->[$NMcube->pack([ [$k, $l], [@$I, @$P] ])] = 0;
+                $S->cival([ [$k, $l], [@$I, @$P] ]) = 0;
             }
         }
     }
