@@ -1,3 +1,15 @@
+=encoding utf8
+
+=head1 NAME
+
+CInet::Adhesive - Blackbox selfadhesivity testing
+
+=head1 SYNOPSIS
+
+    ....
+
+=cut
+
 # ABSTRACT: Blackbox selfadhesivity testing
 package CInet::Adhesive;
 
@@ -7,8 +19,32 @@ use Export::Attrs;
 
 use CInet::Base;
 use Array::Set qw(set_diff);
-use List::Util qw(all);
+use List::Util qw(all any);
 use Algorithm::Combinatorics qw(subsets);
+
+=head1 DESCRIPTION
+
+This module implements a structural selfadhesivity test using an oracle
+for the base family of CI relations.
+
+=head2 EXPORTS
+
+Two functions are exported by default:
+
+    my $bool = is_selfadhesive_at($A, $oracle, $I)
+    my $bool = is_selfadhesive($A, $oracle, $orders);
+
+=cut
+
+=head3 is_selfadhesive_at
+
+    my $bool = is_selfadhesive_at($A, $oracle, $I)
+
+Tests if C<$A> is selfadhesive at the set C<$I> with respect to the family
+defined by C<$oracle>. That coderef must accept a CI structure on any
+ground set and decide if it belongs to the family or not.
+
+=cut
 
 sub is_selfadhesive_at :Export(:DEFAULT) {
     my ($x, $realiz, $I) = @_;
@@ -68,10 +104,38 @@ sub is_selfadhesive_at :Export(:DEFAULT) {
     $realiz->($S)
 }
 
+=head3 is_selfadhesive
+
+    my $bool = is_selfadhesive($A, $oracle, $orders)
+
+This function calls L<is_selfadhesive_at|/"is_selfadhesive_at"> with
+all subsets C<$I> that have cardinality in the arrayref C<$orders>.
+If C<$orders> is not given, it defaults to all possible orders between
+0 and the dimension of the cube of C<$A>.
+
+=cut
+
+
 sub is_selfadhesive :Export(:DEFAULT) {
-    my ($x, $realiz) = @_;
-    return all { is_selfadhesive_at $x, $realiz, $_ }
-        map { $_->[1] } Cube($x)->vertices
+    my ($x, $realiz, $orders) = @_;
+    my $cube = Cube($x);
+    $orders //= [ 0 .. $cube->dim ];
+    return all { is_selfadhesive_at($x, $realiz, $_)  }
+        grep { my $k = @$_; any { $_ == $k } @$orders }
+        map  { $_->[1] } $cube->vertices
 }
+
+=head1 AUTHOR
+
+Tobias Boege <tobs@taboege.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (C) 2020 by Tobias Boege.
+
+This is free software; you can redistribute it and/or
+modify it under the terms of the Artistic License 2.0.
+
+=cut
 
 ":wq"
