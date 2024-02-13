@@ -6,7 +6,7 @@ CInet::Adhesive - Blackbox selfadhesivity testing
 
 =head1 SYNOPSIS
 
-    ....
+    my $bool = is_selfadhesive($A, $oracle);
 
 =cut
 
